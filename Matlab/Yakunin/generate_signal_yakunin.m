@@ -1,4 +1,4 @@
-function y = generate_signal(t, A, tau1, tau2)
+function y = generate_signal_yakunin(t, A, tau1, tau2)
 % GENERATE_SIGNAL Генерация импульса
 % Входные параметры:
 %   t    - вектор отсчетов времени
@@ -16,6 +16,6 @@ function y = generate_signal(t, A, tau1, tau2)
     idx = (t >= 0);
     
     % Вычисляем значения по заданной формуле только для t >= 0
-    % Операции деления и умножения выполняем поэлементно (через точку)
+    % Операции деления и умножения поэлементно (через точку)
     y(idx) = A * (exp(-t(idx) / tau1) - exp(-t(idx) / tau2));
 end

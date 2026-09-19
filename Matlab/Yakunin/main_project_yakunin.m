@@ -16,7 +16,7 @@ tau2 = 5;       % Постоянная времени нарастания фр�
 t = -10:1:100;
 
 % Вызов функции генерации аналитического импульса (Задание 1)
-y = generate_signal(t, A, tau1, tau2);
+y = generate_signal_yakunin(t, A, tau1, tau2);
 
 
 %% ================== ЗАДАНИЕ 3: Треугольный фильтр =======================
@@ -26,28 +26,36 @@ l = 7;          % Время спада треугольника (отсчето
 M = 16;         % Параметр компенсации спада (соответствует tau1 = 16)
 
 % Вызов m-функции цифровой фильтрации (Задание 3)
-s = triangular_filter(y, k, l, M);
+s = triangular_filter_yakunin(y, k, l, M);
 
 
 %% ================= ПОСТРОЕНИЕ И ОФОРМЛЕНИЕ ГРАФИКОВ =====================
-% Создаем единое окно для сопоставления входного и выходного сигналов
-figure('Name', 'Моделирование: Вариант 8 (Иорданов)', ...
-       'Color', 'w', 'Position', [120, 80, 850, 700]);
+% Создаем окно
+figure('Name', 'Моделирование: Вариант 8', 'Position', [120, 80, 850, 700]);
 
 % --- График 1: Исходный импульс y(t) ---
 subplot(2, 1, 1);
-plot(t, y, 'b-', 'LineWidth', 1.8);
+plot(t, y, 'b-', 'LineWidth', 2);
 grid on;
-xlabel('Время t (отсчеты)');
-ylabel('Амплитуда y(t)');
-title('Задания 1–2: Исходный импульс с экспоненциальным хвостом y(t)');
-legend('y(t) [\tau_1 = 16, \tau_2 = 5]', 'Location', 'northeast');
+xlim([-10, 100]);                          % Убираем лишний отступ до -20 слева
+
+title('Задания 1–2: Исходный импульс y(t)', ...
+      'Color', 'w', 'FontSize', 12, 'FontWeight', 'bold');
+xlabel('Время t (отсчеты)', 'Color', 'w', 'FontSize', 11, 'FontWeight', 'bold');
+ylabel('Амплитуда y(t)',   'Color', 'w', 'FontSize', 11, 'FontWeight', 'bold');
+set(gca, 'XColor', 'w', 'YColor', 'w', 'GridColor', [0.6 0.6 0.6], 'GridAlpha', 0.4);
+legend('y(t) [\tau_1 = 16, \tau_2 = 5]', 'Location', 'northeast', 'TextColor', 'w');
+
 
 % --- График 2: Отфильтрованный импульс s(n) ---
 subplot(2, 1, 2);
-plot(t, s, 'r-', 'LineWidth', 1.8);
+plot(t, s, 'r-', 'LineWidth', 2);
 grid on;
-xlabel('Время t (номер отсчета n)');
-ylabel('Амплитуда s(n)');
-title('Задание 3: Результат работы треугольного фильтра s(n) [k=7, l=7, M=16]');
-legend('s(n) — сформированный треугольный импульс', 'Location', 'northeast');
+xlim([-10, 100]);                          % Синхронизируем шкалу с верхним графиком
+
+title('Задание 3: Результат работы треугольного фильтра s(n) [k=7, l=7, M=16]', ...
+      'Color', 'w', 'FontSize', 12, 'FontWeight', 'bold');
+xlabel('Время t (номер отсчета n)', 'Color', 'w', 'FontSize', 11, 'FontWeight', 'bold');
+ylabel('Амплитуда s(n)',            'Color', 'w', 'FontSize', 11, 'FontWeight', 'bold');
+set(gca, 'XColor', 'w', 'YColor', 'w', 'GridColor', [0.6 0.6 0.6], 'GridAlpha', 0.4);
+legend('s(n) — сформированный треугольный импульс', 'Location', 'northeast', 'TextColor', 'w');
