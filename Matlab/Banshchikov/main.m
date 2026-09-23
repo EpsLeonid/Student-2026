@@ -1,36 +1,36 @@
-% Главный проект
+% Main project script
 clc; clear; close all;
 
-% --- Задания 1 и 2: Параметры и генерация сигнала ---
+% --- Tasks 1 & 2: Parameters and initial signal generation ---
 t1 = 16;
 t2 = 5;
 t_start = -10;
 t_end = 100;
 dt = 1;
 
-% Вызов функции генерации исходного сигнала
+% Call m-function to generate the input signal
 [t, y] = generate_signal(t1, t2, t_start, t_end, dt);
 
-% График исходного сигнала
-figure('Name', 'Задание 1 и 2: Исходный сигнал');
+% Plot initial signal
+figure('Name', 'Task 1 and 2: Initial Signal');
 plot(t, y, 'b-', 'LineWidth', 1.5);
 grid on;
-title('Исходный экспоненциальный сигнал y(t)');
-xlabel('Время t');
-ylabel('Амплитуда y');
+title('Bi-exponential Pulse Signal y(t)');
+xlabel('Time t');
+ylabel('Amplitude y');
 
-% --- Задание 3: Вариант 2 (Треугольный фильтр, формулы Б) ---
+% --- Task 3: Variant 2 (Triangular Filter, Formulas B) ---
 k = 5;
 l = 5;
 M = 16;
 
-% Вызов m-функции фильтрации
+% Call m-function for triangular filtering
 s = apply_filter(y, k, l, M);
 
-% График отфильтрованного сигнала
-figure('Name', 'Задание 3: Результат треугольной фильтрации');
+% Plot final filtered signal
+figure('Name', 'Task 3: Filtered Signal Output');
 plot(t, s, 'r-', 'LineWidth', 1.5);
 grid on;
-title('Выходной сигнал фильтра s(n) (Треугольный фильтр, Вариант 2)');
-xlabel('Время t (индекс n)');
-ylabel('Амплитуда s');
+title('Filtered Signal s(n) (Triangular Filter, Variant 2)');
+xlabel('Time t (index n)');
+ylabel('Amplitude s');

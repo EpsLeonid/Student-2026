@@ -1,32 +1,32 @@
 function s = apply_filter(v, k, l, M)
-    % apply_filter — m-функция для треугольной фильтрации сигнала (формулы Б)
+    % apply_filter - Performs triangular filtering (Formulas B)
     %
-    % Назначение: преобразует экспоненциальный сигнал v(n) в треугольный импульс s(n).
+    % Purpose: Transforms bi-exponential input signal v(n) into triangular pulse s(n).
     %
-    % Входные параметры:
-    %   v — исходный массив сигнала (вектор)
-    %   k — длина первой фазы формирования фронта
-    %   l — длина второй фазы формирования фронта
-    %   M — коэффициент компенсации экспоненциального спада
+    % Input parameters:
+    %   v - Input signal array
+    %   k - Shaping parameter for the first edge phase
+    %   l - Shaping parameter for the second edge phase
+    %   M - Decay compensation parameter
     %
-    % Выходной параметр:
-    %   s — финальный отфильтрованный сигнал
+    % Output parameter:
+    %   s - Final filtered signal array
 
-    N = length(v); % Длина входного сигнала
+    N = length(v); % Input signal length
     
-    % Выделяем память под промежуточные и выходные массивы
+    % Pre-allocate memory for intermediate and output arrays
     d_kl = zeros(1, N);
     p    = zeros(1, N);
     r    = zeros(1, N);
     s    = zeros(1, N);
 
-    % Вспомогательная функция для получения v(n - offset)
-    % Учитывает, что индексы в MATLAB начинаются с 1 (при n - offset <= 0 возвращает 0)
+    % Helper function to safely fetch v(n - offset)
+    % Handles MATLAB 1-based indexing (returns 0 for n - offset <= 0)
     get_v = @(n, offset) (n - offset >= 1) * v(max(1, n - offset));
 
-    % Итеративный расчет рекурсивного фильтра по шагам n
+    % Iterative implementation of the recursive filter
     for n = 1:N
-        % 1. Расчет первой разности: d^(k,l)(n) = v(n) - v(n-k) - v(n-l) + v(n-k-l)
+        % Step 1: Calculate first difference d^(k,l)(n) = v(n) - v(n-k) - v(n-l) + v(n-k-l)
         v_curr = v(n);
         v_nk   = get_v(n, k);
         v_nl   = get_v(n, l);
@@ -34,17 +34,17 @@ function s = apply_filter(v, k, l, M)
         
         d_kl(n) = v_curr - v_nk - v_nl + v_nkl;
 
-        % 2. Первое интегрирование: p(n) = p(n-1) + d^(k,l)(n)
+        % Step 2: First integration stage p(n) = p(n-1) + d^(k,l)(n)
         if n == 1
             p(n) = d_kl(n);
         else
             p(n) = p(n - 1) + d_kl(n);
         end
 
-        % 3. Коррекция спада: r(n) = p(n) + M * d^(k,l)(n)
+        % Step 3: Decay compensation r(n) = p(n) + M * d^(k,l)(n)
         r(n) = p(n) + M * d_kl(n);
 
-        % 4. Второе интегрирование: s(n) = s(n-1) + r(n)
+        % Step 4: Second integration stage s(n) = s(n-1) + r(n)
         if n == 1
             s(n) = r(n);
         else

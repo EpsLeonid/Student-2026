@@ -1,26 +1,27 @@
 function [t, y] = generate_signal(t1, t2, t_start, t_end, dt)
-    % generate_signal — функция для генерации двухэкспоненциального импульса
-    % Входные параметры:
-    %   t1, t2  — постоянные времени (tau1, tau2)
-    %   t_start — начало интервала времени
-    %   t_end   — конец интервала времени
-    %   dt      — шаг по времени
+    % generate_signal - Generates a bi-exponential pulse signal
     %
-    % Выходные параметры:
-    %   t — вектор времени
-    %   y — вектор значений функции
+    % Input parameters:
+    %   t1, t2  - Time constants (tau1, tau2)
+    %   t_start - Start time of the interval
+    %   t_end   - End time of the interval
+    %   dt      - Time step
+    %
+    % Output parameters:
+    %   t - Time vector
+    %   y - Signal output array
 
-    A = 1; % Амплитуда равна 1 по условию
+    A = 1; % Signal amplitude defined by assignment rules
     
-    % Формируем массив времени от t_start до t_end с шагом dt
+    % Create time vector from t_start to t_end with step dt
     t = t_start:dt:t_end;
     
-    % Инициализируем массив нулями (для всех t < 0 значение будет 0)
+    % Initialize output array with zeros (for t < 0)
     y = zeros(size(t));
     
-    % Находим индексы элементов, где t >= 0
+    % Find indices where t >= 0
     idx = (t >= 0);
     
-    % Вычисляем формулу только для элементов с t >= 0
+    % Calculate formula values for t >= 0
     y(idx) = A * (exp(-t(idx) / t1) - exp(-t(idx) / t2));
 end
