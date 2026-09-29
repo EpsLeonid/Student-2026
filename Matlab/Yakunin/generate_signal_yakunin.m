@@ -1,20 +1,20 @@
 function y = generate_signal_yakunin(t, A, tau1, tau2)
-% входные параметры:
-%   t    - вектор отсчетов времени
-%   A    - амплитуда сигнала
-%   tau1 - постоянная времени спада
-%   tau2 - постоянная времени нарастания
-% выходной параметр:
-%   y    - результирующий массив значений функции
+% input parameters:
+%   t    - time samples vector
+%   A    - signal amplitude
+%   tau1 - decay time constant
+%   tau2 - rise time constant
+% output parameter:
+%   y    - resulting array of function values
 
-    % инициализируем массив нулями той же длины, что и вектор t
-    % это автоматически решает условие: y = 0 при t < 0
+    % initialize the array with zeros of the same length as vector t
+    % this automatically satisfies the condition: y = 0 for t < 0
     y = zeros(size(t));
     
-    % создаем логическую маску для индексов, где t >= 0
+    % create a logical mask for indices where t >= 0
     idx = (t >= 0);
     
-    % вычисляем значения по заданной формуле только для t >= 0
-    % операции деления и умножения поэлементно (через точку)
+    % compute values according to the given formula only for t >= 0
+    % element-wise division and multiplication operations (using a dot)
     y(idx) = A * (exp(-t(idx) / tau1) - exp(-t(idx) / tau2));
 end

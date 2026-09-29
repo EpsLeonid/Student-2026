@@ -1,59 +1,59 @@
 % =========================================================================
-% главный проект: моделирование в MATLAB
+% Main Project: Modeling in MATLAB
 % =========================================================================
 
-clear;      % очистить рабочую область переменных от старых данных
-clc;        % очистить командное окно
-close all;  % закрыть все открытые графики
+clear;      % clear workspace variables from old data
+clc;        % clear command window
+close all;  % close all open figures
 
-%% ==================== задание 1 и 2 ====================
-% исходные данные:
-A = 1;          % амплитуда
-tau1 = 16;      % постоянная времени экспоненциального спада
-tau2 = 5;       % постоянная времени нарастания фронта
+%% ==================== Tasks 1 and 2 ====================
+% initial data:
+A = 1;          % amplitude
+tau1 = 16;      % exponential decay time constant
+tau2 = 5;       % rise time constant
 
-% дискретная шкала времени: от -10 до 100 с шагом 1 отсчет
+% discrete time scale: from -10 to 100 with a step of 1 sample
 t = -10:1:100;
 
-% вызов функции (Задание 1)
+% function call (Task 1)
 y = generate_signal_yakunin(t, A, tau1, tau2);
 
 
-%% ================== задание 1: треугольный фильтр =======================
-% исходные данные (формулы Б):
-k = 7;          % время нарастания треугольника (отсчетов)
-l = 7;          % время спада треугольника (отсчетов)
-M = 16;         % параметр компенсации спада (соответствует tau1 = 16)
+%% ================== Task 1: Triangular Filter =======================
+% initial data (Formulas B):
+k = 7;          % triangle rise time (samples)
+l = 7;          % triangle decay time (samples)
+M = 16;         % decay compensation parameter (corresponds to tau1 = 16)
 
-% вызов m-функции цифровой фильтрации (Задание 3)
+% call of the digital filtering m-function (Task 3)
 s = triangular_filter_yakunin(y, k, l, M);
 
 
-%% ================= построение графиков =====================
-% создаем окно
-figure('Name', 'Моделирование: Вариант 8', 'Position', [120, 80, 850, 700]);
+%% ================= Plotting =====================
+% create figure window
+figure('Name', 'Simulation: Variant 8', 'Position', [120, 80, 850, 700]);
 
-% график 1: Исходный импульс y(t)
+% Plot 1: Original pulse y(t)
 subplot(2, 1, 1);
 plot(t, y, 'b-', 'LineWidth', 2);
 grid on;
-xlim([-10, 100]);                          % Убираем лишний отступ до -20 слева
+xlim([-10, 100]);                          % Remove excess margin to -20 on the left
 
-title('Задания 1–2: Исходный импульс y(t)', ...
+title('Tasks 1–2: Original Pulse y(t)', ...
       'Color', 'w', 'FontSize', 12, 'FontWeight', 'bold');
-xlabel('Время t (отсчеты)', 'Color', 'w', 'FontSize', 11, 'FontWeight', 'bold');
-ylabel('Амплитуда y(t)',   'Color', 'w', 'FontSize', 11, 'FontWeight', 'bold');
+xlabel('Time t (samples)', 'Color', 'w', 'FontSize', 11, 'FontWeight', 'bold');
+ylabel('Amplitude y(t)',   'Color', 'w', 'FontSize', 11, 'FontWeight', 'bold');
 legend('y(t) [\tau_1 = 16, \tau_2 = 5]', 'Location', 'northeast', 'TextColor', 'w');
 
 
-% график 2: Отфильтрованный импульс s(n) 
+% Plot 2: Filtered pulse s(n) 
 subplot(2, 1, 2);
 plot(t, s, 'r-', 'LineWidth', 2);
 grid on;
-xlim([-10, 100]);                          % Синхронизируем шкалу с верхним графиком
+xlim([-10, 100]);                          % Synchronize scale with the upper plot
 
-title('Задание 3: Результат работы треугольного фильтра s(n) [k=7, l=7, M=16]', ...
+title('Task 3: Triangular Filter Output s(n) [k=7, l=7, M=16]', ...
       'Color', 'w', 'FontSize', 12, 'FontWeight', 'bold');
-xlabel('Время t (номер отсчета n)', 'Color', 'w', 'FontSize', 11, 'FontWeight', 'bold');
-ylabel('Амплитуда s(n)',            'Color', 'w', 'FontSize', 11, 'FontWeight', 'bold');
-legend('s(n) — сформированный треугольный импульс', 'Location', 'northeast', 'TextColor', 'w');
+xlabel('Time t (sample index n)', 'Color', 'w', 'FontSize', 11, 'FontWeight', 'bold');
+ylabel('Amplitude s(n)',            'Color', 'w', 'FontSize', 11, 'FontWeight', 'bold');
+legend('s(n) — shaped triangular pulse', 'Location', 'northeast', 'TextColor', 'w');

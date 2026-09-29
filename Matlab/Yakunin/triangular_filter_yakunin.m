@@ -1,63 +1,63 @@
 function [s, p, r, d] = triangular_filter_yakunin(v, k, l, M)
-% треугольный фильтр (формулы Б, вариант 8)
-% входные параметры:
-%   v - вектор входного сигнала y(t)
-%   k - параметр нарастания треугольника (для вар. 8: k = 7)
-%   l - параметр спада треугольника (для вар. 8: l = 7)
-%   M - параметр компенсации спада (для вар. 8: M = 16)
+% triangular filter (formulas B, variant 8)
+% input parameters:
+%   v - input signal vector y(t)
+%   k - triangle rise parameter (for var. 8: k = 7)
+%   l - triangle decay parameter (for var. 8: l = 7)
+%   M - decay compensation parameter (for var. 8: M = 16)
 %
-% выходные параметры:
-%   s - итоговый отфильтрованный сигнал s(n)
-%   p - промежуточный сигнал после первого интегратора
-%   r - сигнал после блока компенсации спада (десвертки / HPD)
-%   d - сигнал двойной разности d^{k,l}(n)
+% output parameters:
+%   s - final filtered signal s(n)
+%   p - intermediate signal after the first integrator
+%   r - signal after the decay compensation block (deconvolution / HPD)
+%   d - double difference signal d^{k,l}(n)
 
-    % векторизация
-    is_col = iscolumn(v);  % проверка, является ли входный вектор столбцом или строкой. Результат запоминается во флаг is_col
-    v = v(:)'; % преобразует вектор в вектор-строку
-    N = length(v); % общее количество точек сигнала
+    % vectorization
+    is_col = iscolumn(v);  % check whether the input vector is a column or a row. The result is stored in the is_col flag
+    v = v(:)'; % transforms the vector into a row vector
+    N = length(v); % total number of signal points
 
-    % предварительное выделение памяти под массивы 
-    d = zeros(1, N);  % массив двойной разности d^{k,l}(n)
-    p = zeros(1, N);  % массив первого накопителя 
-    r = zeros(1, N);  % промежуточный сигнал после десвертки
-    s = zeros(1, N);  % выходной сигнал после второго накопителя
+    % preallocating memory for arrays 
+    d = zeros(1, N);  % double difference array d^{k,l}(n)
+    p = zeros(1, N);  % first accumulator array 
+    r = zeros(1, N);  % intermediate signal after deconvolution
+    s = zeros(1, N);  % output signal after the second accumulator
 
-    % пошаговая фильтрация
+    % step-by-step filtering
     for n = 1:N
         % -------------------------------------------------------------
-        % шаг 1: Вычисление d^{k,l}(n) по уравнению (1) статьи:
-        % два последовательных блока дифференцирования (DS-блока)
+        % Step 1: Calculation of d^{k,l}(n) according to equation (1) of the article:
+        % two consecutive differentiation blocks (DS-blocks)
         % -------------------------------------------------------------
         v_n = v(n);
         
-        % учет запаздывания на k отсчетов (если n-k < 1, значение равно 0):
+        % accounting for delay by k samples (if n-k < 1, the value is 0):
         if (n - k >= 1)
             v_nk = v(n - k);
         else
             v_nk = 0;
         end
         
-        % учет запаздывания на l отсчетов:
+        % accounting for delay by l samples:
         if (n - l >= 1)
             v_nl = v(n - l);
         else
             v_nl = 0;
         end
         
-        % учет суммарного запаздывания на (k+l) отсчетов:
+        % accounting for total delay by (k+l) samples:
         if (n - k - l >= 1)
             v_nkl = v(n - k - l);
         else
             v_nkl = 0;
         end
         
-        % ур. 1
-        % вторая разность выделяет изменения входного сигнала:
+        % eq. 1
+        % second difference extracts changes in the input signal:
         d(n) = v_n - v_nk - v_nl + v_nkl;
 
         % -------------------------------------------------------------
-        % шаг 2: Первый цифровой интегратор:
+        % Step 2: First digital integrator:
         % p(n) = p(n-1) + d^{k,l}(n), n >= 0
         % -------------------------------------------------------------
         if (n - 1 >= 1)
@@ -70,20 +70,20 @@ function [s, p, r, d] = triangular_filter_yakunin(v, k, l, M)
         p(n) = p_prev + d(n);
 
         % -------------------------------------------------------------
-        % шаг 3: Десвертка / компенсация спада:
+        % Step 3: Deconvolution / decay compensation:
         % r(n) = p(n) + M * d^{k,l}(n)
-        % слагаемое M*d(n) компенсирует экспоненциальный спад exp(-t/16)
+        % the term M*d(n) compensates for the exponential decay exp(-t/16)
         % -------------------------------------------------------------
         r(n) = p(n) + M * d(n);
 
         % -------------------------------------------------------------
-        % шаг 4: Второй цифровой интегратор:
+        % Step 4: Second digital integrator:
         % s(n) = s(n-1) + r(n), n >= 0
-        % интегрирует сигнал r(n), формируя треугольный импульс
+        % integrates the signal r(n), forming a triangular pulse
         % -------------------------------------------------------------
         s(n) = s_prev + r(n);
     end
-    % восстановление исходной ориентации
+    % restore original orientation
     if is_col
         s = s(:); p = p(:); r = r(:); d = d(:);
     end
