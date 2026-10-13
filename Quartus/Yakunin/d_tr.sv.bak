@@ -1,0 +1,17 @@
+// module name: d_tr
+// the module name MUST match the file name: d_tr.sv
+module d_ff (
+    input  logic clk, // clock input signal
+    input  logic d,   // data input signal (1-bit)
+    output logic out  // data output signal (stored state, 1-bit)
+);
+
+    // sequential logic block: triggered on the rising (positive) clock edge
+    // 'always_ff' is a SystemVerilog construct dedicated to modeling flip-flops
+    always_ff @(posedge clk) begin
+        // non-blocking assignment (<=) is mandatory for sequential/clocked logic
+        out <= d;
+    end
+
+// end of module declaration
+endmodule

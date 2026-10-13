@@ -1,0 +1,16 @@
+Fitter Status : Successful - Sat Oct 10 17:28:32 2026
+Quartus II 64-Bit Version : 9.1 Build 350 03/24/2010 SP 2 SJ Full Version
+Revision Name : task_2
+Top-level Entity Name : task_2
+Family : Cyclone III
+Device : EP3C40U484C6
+Timing Models : Final
+Total logic elements : 25 / 39,600 ( < 1 % )
+    Total combinational functions : 24 / 39,600 ( < 1 % )
+    Dedicated logic registers : 25 / 39,600 ( < 1 % )
+Total registers : 25
+Total pins : 107 / 332 ( 32 % )
+Total virtual pins : 0
+Total memory bits : 0 / 1,161,216 ( 0 % )
+Embedded Multiplier 9-bit elements : 3 / 252 ( 1 % )
+Total PLLs : 0 / 4 ( 0 % )

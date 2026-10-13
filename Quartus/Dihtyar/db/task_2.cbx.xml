@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<LOG_ROOT>
+	<PROJECT NAME="task_2">
+		<CBX_INST_ENTRY INSTANCE_NAME="|task_2|multiplier:inst_p2|lpm_mult:Mult0" CBX_FILE_NAME="mult_19t.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|task_2|reg_calc_8bit:inst_p4|lpm_mult:Mult0" CBX_FILE_NAME="mult_19t.tdf"/>
+		<CBX_INST_ENTRY INSTANCE_NAME="|task_2|reg_calc_param:inst_p5|lpm_mult:Mult0" CBX_FILE_NAME="mult_19t.tdf"/>
+	</PROJECT>
+</LOG_ROOT>
