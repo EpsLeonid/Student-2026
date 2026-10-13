@@ -1,35 +1,6 @@
-|mult_ab
-a[0] => Mult0.IN7
-a[1] => Mult0.IN6
-a[2] => Mult0.IN5
-a[3] => Mult0.IN4
-a[4] => Mult0.IN3
-a[5] => Mult0.IN2
-a[6] => Mult0.IN1
-a[7] => Mult0.IN0
-b[0] => Mult0.IN15
-b[1] => Mult0.IN14
-b[2] => Mult0.IN13
-b[3] => Mult0.IN12
-b[4] => Mult0.IN11
-b[5] => Mult0.IN10
-b[6] => Mult0.IN9
-b[7] => Mult0.IN8
-c[0] <= Mult0.DB_MAX_OUTPUT_PORT_TYPE
-c[1] <= Mult0.DB_MAX_OUTPUT_PORT_TYPE
-c[2] <= Mult0.DB_MAX_OUTPUT_PORT_TYPE
-c[3] <= Mult0.DB_MAX_OUTPUT_PORT_TYPE
-c[4] <= Mult0.DB_MAX_OUTPUT_PORT_TYPE
-c[5] <= Mult0.DB_MAX_OUTPUT_PORT_TYPE
-c[6] <= Mult0.DB_MAX_OUTPUT_PORT_TYPE
-c[7] <= Mult0.DB_MAX_OUTPUT_PORT_TYPE
-c[8] <= Mult0.DB_MAX_OUTPUT_PORT_TYPE
-c[9] <= Mult0.DB_MAX_OUTPUT_PORT_TYPE
-c[10] <= Mult0.DB_MAX_OUTPUT_PORT_TYPE
-c[11] <= Mult0.DB_MAX_OUTPUT_PORT_TYPE
-c[12] <= Mult0.DB_MAX_OUTPUT_PORT_TYPE
-c[13] <= Mult0.DB_MAX_OUTPUT_PORT_TYPE
-c[14] <= Mult0.DB_MAX_OUTPUT_PORT_TYPE
-c[15] <= Mult0.DB_MAX_OUTPUT_PORT_TYPE
+|d_tr
+clk => out~reg0.CLK
+d => out~reg0.DATAIN
+out <= out~reg0.DB_MAX_OUTPUT_PORT_TYPE
 
 
