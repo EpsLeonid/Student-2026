@@ -1,0 +1,29 @@
+// task5_reg.sv
+// Параметризованный регистр: по фронту clk DATA_OUT <= A*B + C.
+// Разрядности A, B, C и DATA_OUT берутся из task5_params.vh.
+// DATA_OUT шириной 2*WIDTH - переполнения нет.
+
+module task5_verilog (
+    input  logic                 clk,        // тактовый сигнал
+    input  logic [WIDTH-1:0]     A,          // первый множитель
+    input  logic [WIDTH-1:0]     B,          // второй множитель
+    input  logic [WIDTH-1:0]     C,          // слагаемое
+    output logic [OUT_WIDTH-1:0] DATA_OUT    // результат: A*B + C без переполнения
+);
+
+    `include "task5_params.vh"
+
+    // A*B: два WIDTH-битных числа дают до 2*WIDTH бит, поэтому ширина 2*WIDTH.
+    logic [PROD_WIDTH-1:0] product;
+
+    // assign — комбинационная логика: product пересчитывается
+    // сразу при изменении A или B, без тактового сигнала.
+    assign product = A * B;
+
+    // По фронту clk: DATA_OUT <= product + C.
+    // Переполнения нет, т.к. DATA_OUT шириной 2*WIDTH.
+    always_ff @(posedge clk) begin
+        DATA_OUT <= product + C;
+    end
+
+endmodule
