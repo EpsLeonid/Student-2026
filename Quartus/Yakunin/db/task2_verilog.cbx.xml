@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<LOG_ROOT>
+	<PROJECT NAME="task2_verilog">
+		<CBX_INST_ENTRY INSTANCE_NAME="|mult_ab|lpm_mult:Mult0" CBX_FILE_NAME="mult_19t.tdf"/>
+	</PROJECT>
+</LOG_ROOT>
