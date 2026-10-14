@@ -1,18 +1,14 @@
-// A, B - входные сигналы шириной WIDTH = 8 бит, 
-// C - выходной сигнал шириной 2*WIDTH бит.
-// Ўирина C = 2*WIDTH, т.к. произведение двух WIDTH-битных
-// чисел занимает до 2*WIDTH бит, а при меньшей ширине старшие
-// биты результата обрезались бы.
+// A and B are single-bit input signals.
+// C is a single-bit output signal.
+// When A and B are 1 bit in size, the product A*B is also 1 bit.
 
-module task2_verilog #(
-    parameter int WIDTH = 8    // «адаю разр€дность входных сигналов A и B.
-) (
-    input  logic [WIDTH-1:0]   A,   // ѕервый множитель,
-    input  logic [WIDTH-1:0]   B,   // ¬торой множитель,
-    output logic [2*WIDTH-1:0] C    // ѕроизведение A * B.
+module task2_verilog (
+    input  logic A,   // A,
+    input  logic B,   // B
+    output logic C    // A * B, 1 bit.
 );
 
-    // Ќепрерывное присваивание: C пересчитываетс€ при изменении A или B.
+    // Continuous assignment: C is recalculated when A or B changes.
     assign C = A * B;
 
 endmodule

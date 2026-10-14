@@ -100,6 +100,7 @@ Quartus/Milovanova/db/mult_19t.tdf
 Quartus/Milovanova/db/logic_util_heursitic.dat
 Quartus/Milovanova/db/task2_verilog.hif
 Quartus/Milovanova/task2_verilog.vwf
+<<<<<<< Updated upstream
 Quartus/Dihtyar/db/
 Quartus/Dihtyar/incremental_db/
 *.bak
@@ -224,3 +225,8 @@ Quartus/Dihtyar/task_2.sim.rpt
 Quartus/Dihtyar/task_2.sta.rpt
 Quartus/Dihtyar/task_2.sta.summary
 Quartus/Dihtyar/task_2.sv.bak
+=======
+Quartus/Milovanova/db/task2_verilog.(3).cnf.cdb
+Quartus/Milovanova/db/task2_verilog.(3).cnf.hdb
+Quartus/Milovanova/db/task2_verilog.fnsim.cdb
+>>>>>>> Stashed changes

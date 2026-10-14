@@ -1,27 +1,27 @@
-// 8-разрядный регистр с тактированием по положительному фронту clk.
-// В момент фронта выполняется: DATA_OUT <= A * B + C.
-// A, B, C - 8-битные входы, DATA_OUT - младшие 8 бит суммы.
-// A * B считается в 16-битном сигнале product, чтобы старшие
-// биты произведения не потерялись до сложения с C.
+// 8-bit edge-clocked register clk.
+// At the moment of the edge, the following is executed: DATA_OUT <= A * B + C.
+// A, B, C are 8-bit inputs, DATA_OUT are the lower 8 bits of the sum.
+// A * B is counted in the 16-bit product signal so that the higher ones
+// bits of the product are not lost before adding with C.
 
 module task4_verilog (
-    input  logic clk,             // Тактовый сигнал, 200 МГц (5 нс) - явно не задан,
-    input  logic [7:0] A,         // Первый множитель,
-    input  logic [7:0] B,         // Второй множитель,
-    input  logic [7:0] C,         // Третий множитель,
-    output logic [7:0] DATA_OUT   // Результат: младшие 8 бит A*B + C.
+    input  logic clk,             // Clock signal, 200 MHz (5 ns)
+    input  logic [7:0] A,         // A,
+    input  logic [7:0] B,         // B,
+    input  logic [7:0] C,         // C,
+    output logic [7:0] DATA_OUT   // Result
 );
 
-    // Произведение A*B: результат умножения двух 8-битных чисел
-    // занимает до 16 бит, поэтому product должен быть 16-битным.
-    // Если сделать его 8-битным, старшие биты потеряются.
+    // Product A*B: the result of multiplying two 8-bit numbers
+    // takes up to 16 bits, so the product must be 16-bit. 
+    // If it were made 8-bit, the high-order bits would be lost.
     logic [15:0] product;
 
-    // Умножение выполняется комбинационно (без тактового сигнала)
+    // Multiplication is performed combinatorially (without a clock signal)
     assign product = A * B;
 
-    // В момент положительного фронта clk в DATA_OUT
-    // записываются младшие 8 бит суммы product + C.
+    // On the rising edge of clk, the lower 8 bits of the sum
+    // product + C are written to DATA_OUT.
     always_ff @(posedge clk) begin
         DATA_OUT <= product + C;
     end

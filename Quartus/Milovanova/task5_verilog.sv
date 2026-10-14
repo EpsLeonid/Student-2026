@@ -1,31 +1,31 @@
-// Разрядности A, B, C и DATA_OUT берутся из файла task5_params.vh,
-// поэтому при изменении WIDTH меняются все шины сразу.
-// DATA_OUT шириной 2*WIDTH, потому что произведение двух WIDTH-битных
-// чисел занимает до 2*WIDTH бит, а прибавление C не выходит за эти
-// пределы, поэтому нет переполнения.
+// The bit widths of A, B, C, and DATA_OUT are derived from the task5_params.vh file,
+// so changing WIDTH updates all buses simultaneously.
+// DATA_OUT has a width of 2*WIDTH because the product of two WIDTH-bit
+// numbers requires up to 2*WIDTH bits, and adding C does not exceed this
+// limit, so no overflow occurs.
 
 module task5_verilog (
-    input  logic clk,                        // Тактовый сигнал
-    input  logic [WIDTH-1:0]     A,          // A
-    input  logic [WIDTH-1:0]     B,          // B
-    input  logic [WIDTH-1:0]     C,          // C
-    output logic [OUT_WIDTH-1:0] DATA_OUT    // Результат: A*B + C
+    input  logic clk,                        // Clock signal,
+    input  logic [WIDTH-1:0]     A,          // A,
+    input  logic [WIDTH-1:0]     B,          // B,
+    input  logic [WIDTH-1:0]     C,          // C,
+    output logic [OUT_WIDTH-1:0] DATA_OUT    // Result: A*B + C.
 );
 
     `include "task5_params.vh"
 
-    // Произведение A*B: ширина PROD_WIDTH = 2*WIDTH, чтобы
-    // результат умножения не обрезался. При WIDTH=8 это 16 бит.
+    // Product A*B: width PROD_WIDTH = 2*WIDTH, so that
+    // the multiplication result is not truncated. For WIDTH=8, this is 16 bits.
     logic [PROD_WIDTH-1:0] product;
 
-    // assign — комбинационная логика: product пересчитывается
-    // сразу при изменении A или B, без тактового сигнала.
+    // assign — combinational logic: product is recalculated
+    // immediately upon a change in A or B, without a clock signal.
     assign product = A * B;
 
-   // По положительному фронту clk выполняется DATA_OUT <= product + C.
-   // Старшие биты суммы отбрасываются, а в DATA_OUT идут только младшие,
-   // тк DATA_OUT шириной 2*WIDTH, а сумма product + C может
-   // занимать больше разрядов.
+    // On the rising edge of clk, the operation DATA_OUT <= product + C is performed.
+    // The most significant bits of the sum are discarded, and only the least significant bits
+    // are assigned to DATA_OUT, because DATA_OUT has a width of 2*WIDTH, whereas
+    // the sum product + C may require more bits.
     always_ff @(posedge clk) begin
         DATA_OUT <= product + C;
     end
