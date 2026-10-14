@@ -1,49 +1,49 @@
 // =================================================================
-// ГЛАВНЫЙ МОДУЛЬ (ОБЩАЯ КОРОБКА) - Объединяет пункты 2, 3, 4 и 5
+// MAIN MODULE - combines items 2, 3, 4 and 5
 // =================================================================
-`include "params.svh" // Подключаем параметры для пункта 5
+`include "params.svh" // Configuring the parameters for item 5
 
 module task_2 (
-    input  logic clk, // Общие часы для всех заданий
+    input  logic clk, // Common clock signal for all tasks
 
-    // Провода для Пункта 2 (Умножение)
-    input  logic [7:0]  p2_A,
-    input  logic [7:0]  p2_B,
-    output logic [15:0] p2_C,
+    // Wires for item 2 (multiplication)
+    input  logic p2_A,
+    input  logic p2_B,
+    output logic p2_C,
 
-    // Провода для Пункта 3 (D-триггер)
-    input  logic        p3_d,
-    output logic        p3_out,
+    // Wires for item 3 (D flip-flop)
+    input  logic p3_d,
+    output logic p3_out,
 
-    // Провода для Пункта 4 (8-битный регистр)
+    // Wires for item 4 (8-bit register)
     input  logic [7:0]  p4_A,
     input  logic [7:0]  p4_B,
     input  logic [7:0]  p4_C,
     output logic [7:0]  p4_DATA_OUT,
 
-    // Провода для Пункта 5 (Параметризованный регистр)
+    // Wires for item 5 (parameterized register)
     input  logic [INPUT_WIDTH-1:0]  p5_A,
     input  logic [INPUT_WIDTH-1:0]  p5_B,
     input  logic [INPUT_WIDTH-1:0]  p5_C,
     output logic [OUTPUT_WIDTH-1:0] p5_DATA_OUT
 );
 
-    // Подключаем внутренний модуль из пункта 2
+    // Connect the internal module from step 2
     multiplier inst_p2 (
         .A(p2_A), .B(p2_B), .C(p2_C)
     );
 
-    // Подключаем внутренний D-триггер из пункта 3
+    // Connect the internal D flip-flop from step 3
     d_flop inst_p3 (
         .clk(clk), .d(p3_d), .out(p3_out)
     );
 
-    // Подключаем внутренний регистр из пункта 4
+    // Connect the internal register from step 4
     reg_calc_8bit inst_p4 (
         .clk(clk), .A(p4_A), .B(p4_B), .C(p4_C), .DATA_OUT(p4_DATA_OUT)
     );
 
-    // Подключаем параметризованный регистр из пункта 5
+    // Connect the internal parameterized register from step 5
     reg_calc_param inst_p5 (
         .clk(clk), .A(p5_A), .B(p5_B), .C(p5_C), .DATA_OUT(p5_DATA_OUT)
     );
@@ -52,19 +52,19 @@ endmodule
 
 
 // ==========================================
-// Пункт 2: Модуль умножения
+// Item 2: Multiplication module
 // ==========================================
 module multiplier (
-    input  logic [7:0] A,
-    input  logic [7:0] B,
-    output logic [15:0] C 
+    input  logic A,
+    input  logic B,
+    output logic C 
 );
     assign C = A * B;
 endmodule
 
 
 // ==========================================
-// Пункт 3: D-триггер
+// Item 3: D flip-flop
 // ==========================================
 module d_flop (
     input  logic clk,
@@ -78,7 +78,7 @@ endmodule
 
 
 // ==========================================
-// Пункт 4: 8-разрядный регистр с вычислением
+// Item 4: 8-bit register
 // ==========================================
 module reg_calc_8bit (
     input  logic       clk,
@@ -87,24 +87,33 @@ module reg_calc_8bit (
     input  logic [7:0] C,
     output logic [7:0] DATA_OUT
 );
+
+	logic [7:0] C_delayed; // Wire to delay sign C by 1 clock cycle
+	
     always_ff @(posedge clk) begin
-        DATA_OUT <= A * B + C;
+		C_delayed <= C; // Delaying sign C
+		
+        DATA_OUT <= A * B + C_delayed;
     end
 endmodule
 
 
 // ==========================================
-// Пункт 5: Параметризованный модуль регистра
+// Item 5: Parameterized register module
 // ==========================================
 module reg_calc_param (
-    input  logic                    clk,
+    input  logic clk,
     input  logic [INPUT_WIDTH-1:0]  A,
     input  logic [INPUT_WIDTH-1:0]  B,
     input  logic [INPUT_WIDTH-1:0]  C,
     output logic [OUTPUT_WIDTH-1:0] DATA_OUT
 );
+
+	logic [INPUT_WIDTH-1:0] C_delayed;
     always_ff @(posedge clk) begin
-        DATA_OUT <= A * B + C;
+		C_delayed <= C;
+		
+        DATA_OUT <= A * B + C_delayed;
     end
 endmodule
 
