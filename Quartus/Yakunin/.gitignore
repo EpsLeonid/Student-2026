@@ -1,0 +1,10 @@
+db/
+incremental_db/
+*.bak
+*.rpt
+*.summary
+*.sof
+*.pof
+*.pin
+*.done
+*.sim.rpt
