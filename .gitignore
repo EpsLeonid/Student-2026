@@ -230,3 +230,5 @@ Quartus/Milovanova/db/task2_verilog.(3).cnf.cdb
 Quartus/Milovanova/db/task2_verilog.(3).cnf.hdb
 Quartus/Milovanova/db/task2_verilog.fnsim.cdb
 >>>>>>> Stashed changes
+*.qws
+*.smsg
