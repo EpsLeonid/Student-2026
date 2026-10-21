@@ -1,7 +1,9 @@
+`include "params.v"
+
 module mac_param #(
-    parameter IN_WIDTH  = 8,                          // Ўирина входных шин (по умолчанию 8)
-    parameter OUT_WIDTH = (2 * IN_WIDTH) + 1          // Ўирина выходной шины дл€ предотвращени€ переполнени€ (17 бит)
-)(
+    parameter W = IN_WIDTH,
+    parameter OW = OUT_WIDTH
+) (
     input  logic                  clk,
     input  logic [IN_WIDTH-1:0]   a,
     input  logic [IN_WIDTH-1:0]   b,
