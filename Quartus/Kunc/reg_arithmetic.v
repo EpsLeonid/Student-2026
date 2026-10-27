@@ -3,7 +3,7 @@ module reg_arithmetic (
     input  wire [7:0] A,
     input  wire [7:0] B,
     input  wire [7:0] C,
-    output reg  [16:0] DATA_OUT
+    output reg  [15:0] DATA_OUT
 );
 
     always @(posedge clk) begin
