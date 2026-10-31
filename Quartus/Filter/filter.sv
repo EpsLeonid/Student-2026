@@ -22,7 +22,8 @@
  *  	rom_exp_sig_gen*/
 //-----------------------------------------------------------------------------
 import package_settings::*;
-import package_v5_params::*;
+import package_v5_params::*;   
+import package_settings_v_3::*; 
 //-----------------------------------------------------------------------------
 module filter (
 //-----------------------------------------------------------------------------
@@ -41,15 +42,15 @@ module filter (
 //-----------------------------------------------------------------------------
 	output wire [SIZE_ADC_DATA-1:0]							output_data_exp_sig_gen,
 //-----------------------------------------------------------------------------
-//	output wire [SIZE_FILTER_DATA-1:0]						output_data_v1,
-//	output wire [SIZE_FILTER_DATA-1:0]						output_data_v2,
-//	output wire [SIZE_FILTER_DATA-1:0]						output_data_v3,
-//	output wire [SIZE_FILTER_DATA-1:0]						output_data_v4,
-	output wire [SIZE_FILTER_DATA-1:0]						output_data_v5
-//	output wire [SIZE_FILTER_DATA-1:0]						output_data_v6,
-//	output wire [SIZE_FILTER_DATA-1:0]						output_data_v7,
-//	output wire [SIZE_FILTER_DATA-1:0]						output_data_v8
-	);
+/*	output wire [SIZE_FILTER_DATA-1:0]						output_data_v1,
+	output wire [SIZE_FILTER_DATA-1:0]						output_data_v2, */
+	output wire [SIZE_FILTER_DATA-1:0]						output_data_v3, 
+/*	output wire [SIZE_FILTER_DATA-1:0]						output_data_v4, */
+	output wire [SIZE_FILTER_DATA-1:0]						output_data_v5  
+/*	output wire [SIZE_FILTER_DATA-1:0]						output_data_v6,
+	output wire [SIZE_FILTER_DATA-1:0]						output_data_v7,
+	output wire [SIZE_FILTER_DATA-1:0]						output_data_v8
+*/	);
 //-----------------------------------------------------------------------------
 // Signal declarations
 //-----------------------------------------------------------------------------
@@ -70,7 +71,7 @@ module filter (
 		.delay												(test_delay),
 		.output_data										(output_data_exp_sig_gen));
                             
-	// Оставляем только v5_filter, остальные закомментированы
+	
 //	v1_filter FilterV1 ( 
 //		.clk                                                  (clk),   
 //		.reset                                                (reset),
@@ -83,11 +84,12 @@ module filter (
 //		.input_data                                           (output_data_exp_sig_gen),
 //		.output_data                                          (output_data_v2));
 
-//	v3_filter FilterV3 (
-//		.clk                                                  (clk),
-//		.reset                                                (reset),
-//		.input_data                                           (output_data_exp_sig_gen),
-//		.output_data                                          (output_data_v3));
+	
+	v3_filter FilterV3 (
+		.clk                                                  (clk),
+		.reset                                                (reset),
+		.v_in                                                 (output_data_exp_sig_gen),
+		.s_out                                                (output_data_v3));        
 
 //	v4_filter FilterV4 (
 //		.clk                                                  (clk),
@@ -95,6 +97,7 @@ module filter (
 //		.input_data                                           (output_data_exp_sig_gen),
 //		.output_data                                          (output_data_v4));
 			
+	
 	v5_filter FilterV5 ( 
 		.clk                                                  (clk),   
 		.reset                                                (reset),
@@ -118,5 +121,5 @@ module filter (
 //		.reset                                                (reset),
 //		.input_data                                           (output_data_exp_sig_gen),
 //		.output_data                                          (output_data_v8));
-//-----------------------------------------------------------------------------
+
 endmodule
