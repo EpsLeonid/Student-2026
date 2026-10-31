@@ -23,7 +23,8 @@
 //-----------------------------------------------------------------------------
 import package_settings::*;
 import package_v5_params::*;   
-import package_settings_v_3::*; 
+import package_settings_v_3::*;
+import package_settings_v_7::*;
 //-----------------------------------------------------------------------------
 module filter (
 //-----------------------------------------------------------------------------
@@ -45,11 +46,11 @@ module filter (
 /*	output wire [SIZE_FILTER_DATA-1:0]						output_data_v1,
 	output wire [SIZE_FILTER_DATA-1:0]						output_data_v2, */
 	output wire [SIZE_FILTER_DATA-1:0]						output_data_v3, 
-/*	output wire [SIZE_FILTER_DATA-1:0]						output_data_v4, */
+/*	output wire [SIZE_FILTER_DATA-1:0]						output_data_v4,*/
 	output wire [SIZE_FILTER_DATA-1:0]						output_data_v5  
-/*	output wire [SIZE_FILTER_DATA-1:0]						output_data_v6,
+/*	output wire [SIZE_FILTER_DATA-1:0]						output_data_v6,*/
 	output wire [SIZE_FILTER_DATA-1:0]						output_data_v7,
-	output wire [SIZE_FILTER_DATA-1:0]						output_data_v8
+/*	output wire [SIZE_FILTER_DATA-1:0]						output_data_v8
 */	);
 //-----------------------------------------------------------------------------
 // Signal declarations
@@ -110,11 +111,11 @@ module filter (
 //		.input_data                                           (output_data_exp_sig_gen),
 //		.output_data                                          (output_data_v6));
 
-//	v7_filter FilterV7 (
-//		.clk                                                  (clk),
-//		.reset                                                (reset),
-//		.input_data                                           (output_data_exp_sig_gen),
-//		.output_data                                          (output_data_v7));
+	v7_filter FilterV7 (
+		.clk                                                  (clk),
+		.reset                                                (reset),
+		.input_data                                           (output_data_exp_sig_gen),
+		.output_data                                          (output_data_v7));
 
 //	v8_filter FilterV8 (
 //		.clk                                                  (clk),
