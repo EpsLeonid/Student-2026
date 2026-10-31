@@ -22,6 +22,7 @@
  *  	rom_exp_sig_gen*/
 //-----------------------------------------------------------------------------
 import package_settings::*;
+import package_v5_params::*;
 //-----------------------------------------------------------------------------
 module filter (
 //-----------------------------------------------------------------------------
@@ -40,15 +41,15 @@ module filter (
 //-----------------------------------------------------------------------------
 	output wire [SIZE_ADC_DATA-1:0]							output_data_exp_sig_gen,
 //-----------------------------------------------------------------------------
-/*	output wire [SIZE_FILTER_DATA-1:0]						output_data_v1,
-	output wire [SIZE_FILTER_DATA-1:0]						output_data_v2,
-	output wire [SIZE_FILTER_DATA-1:0]						output_data_v3,
-	output wire [SIZE_FILTER_DATA-1:0]						output_data_v4,
-	output wire [SIZE_FILTER_DATA-1:0]						output_data_v5,
-	output wire [SIZE_FILTER_DATA-1:0]						output_data_v6,
-	output wire [SIZE_FILTER_DATA-1:0]						output_data_v7,
-	output wire [SIZE_FILTER_DATA-1:0]						output_data_v8,
-*/	);
+//	output wire [SIZE_FILTER_DATA-1:0]						output_data_v1,
+//	output wire [SIZE_FILTER_DATA-1:0]						output_data_v2,
+//	output wire [SIZE_FILTER_DATA-1:0]						output_data_v3,
+//	output wire [SIZE_FILTER_DATA-1:0]						output_data_v4,
+	output wire [SIZE_FILTER_DATA-1:0]						output_data_v5
+//	output wire [SIZE_FILTER_DATA-1:0]						output_data_v6,
+//	output wire [SIZE_FILTER_DATA-1:0]						output_data_v7,
+//	output wire [SIZE_FILTER_DATA-1:0]						output_data_v8
+	);
 //-----------------------------------------------------------------------------
 // Signal declarations
 //-----------------------------------------------------------------------------
@@ -69,53 +70,53 @@ module filter (
 		.delay												(test_delay),
 		.output_data										(output_data_exp_sig_gen));
                             
-/*	v1_filter FilterV1 ( 
+	// Оставляем только v5_filter, остальные закомментированы
+//	v1_filter FilterV1 ( 
+//		.clk                                                  (clk),   
+//		.reset                                                (reset),
+//		.input_data                                           (output_data_exp_sig_gen),
+//		.output_data                                          (output_data_v1));
+		
+//	v2_filter FilterV2 (
+//		.clk                                                  (clk),
+//		.reset                                                (reset),
+//		.input_data                                           (output_data_exp_sig_gen),
+//		.output_data                                          (output_data_v2));
+
+//	v3_filter FilterV3 (
+//		.clk                                                  (clk),
+//		.reset                                                (reset),
+//		.input_data                                           (output_data_exp_sig_gen),
+//		.output_data                                          (output_data_v3));
+
+//	v4_filter FilterV4 (
+//		.clk                                                  (clk),
+//		.reset                                                (reset),
+//		.input_data                                           (output_data_exp_sig_gen),
+//		.output_data                                          (output_data_v4));
+			
+	v5_filter FilterV5 ( 
 		.clk                                                  (clk),   
 		.reset                                                (reset),
 		.input_data                                           (output_data_exp_sig_gen),
-		.output_data                                          (output_data_v1));
-		
-	v2_filter FilterV2 (
-		.clk                                                  (clk),
-		.reset                                                (reset),
-		.input_data                                           (output_data_exp_sig_gen),
-		.output_data                                          (output_data_v2));
-
-	v3_filter FilterV3 (
-		.clk                                                  (clk),
-		.reset                                                (reset),
-		.input_data                                           (output_data_exp_sig_gen),
-		.output_data                                          (output_data_v3));
-
-    v4_filter FilterV4 (
-		.clk                                                  (clk),
-		.reset                                                (reset),
-		.input_data                                           (output_data_exp_sig_gen),
-		.output_data                                          (output_data_v4));
-			
-	v5_filter FilterV5 (
-		.clk                                                  (clk),
-		.reset                                                (reset),
-		.input_data                                           (output_data_exp_sig_gen),
 		.output_data                                          (output_data_v5));
+			
+//	v6_filter FilterV6 (
+//		.clk                                                  (clk),
+//		.reset                                                (reset),
+//		.input_data                                           (output_data_exp_sig_gen),
+//		.output_data                                          (output_data_v6));
 
-	v6_filter FilterV6 (
-		.clk                                                  (clk),
-		.reset                                                (reset),
-		.input_data                                           (output_data_exp_sig_gen),
-		.output_data                                          (output_data_v6));
+//	v7_filter FilterV7 (
+//		.clk                                                  (clk),
+//		.reset                                                (reset),
+//		.input_data                                           (output_data_exp_sig_gen),
+//		.output_data                                          (output_data_v7));
 
-	v7_filter FilterV7 (
-		.clk                                                  (clk),
-		.reset                                                (reset),
-		.input_data                                           (output_data_exp_sig_gen),
-		.output_data                                          (output_data_v7));
-
-	v8_filter FilterV8 (
-		.clk                                                  (clk),
-		.reset                                                (reset),
-		.input_data                                           (output_data_exp_sig_gen),
-		.output_data                                          (output_data_v8));
-*/
+//	v8_filter FilterV8 (
+//		.clk                                                  (clk),
+//		.reset                                                (reset),
+//		.input_data                                           (output_data_exp_sig_gen),
+//		.output_data                                          (output_data_v8));
 //-----------------------------------------------------------------------------
 endmodule
