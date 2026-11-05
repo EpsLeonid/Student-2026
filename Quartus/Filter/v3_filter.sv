@@ -1,72 +1,86 @@
-//-----------------------------------------------------------------------------
-// File        : v3_filter.sv
-// Description : Modified cusp-like filter (Variant 3)
-//-----------------------------------------------------------------------------
-import package_settings_v_3::*;
+//----------------------------------------------------------------------------- 
+// Description : Modified cusp-like filter (Variant 3) 
+// Implements the algorithm: 
+// dk = v(n) - v(n-K) 
+// d1 = v(n) - v(n-1) 
+// p = p_prev + dk - K * d1(n-L) 
+// q = q_prev + M2 * p 
+// s = s_prev + q + M1 * p 
+//----------------------------------------------------------------------------- 
+
+import package_settings::*; // Include global settings
+import package_settings_v_3::*; // Include variant 3 parameters (PARAM_L3, PARAM_K3, PARAM_M13, PARAM_M23)
 
 module v3_filter (
-    input  wire                         clk,
-    input  wire                         reset,
-    input  wire signed [15:0]           v_in,   // Input signal from exponential generator
-    output reg  signed [15:0]           s_out   // Filtered output signal s(n)
+    input wire clk,                           // Clock signal
+    input wire reset,                         // Reset signal
+    input wire [SIZE_ADC_DATA-1:0] v_in,      // Input signal v(n) from the generator
+    output logic [SIZE_FILTER_DATA-1:0] s_out // Filtered registered output s(n)
 );
 
-    // Internal delay lines 
-    reg signed [15:0] v_delay [1:PARAM_K3];
-    reg signed [31:0] d1_delay [1:PARAM_L3];
-
-    // Internal difference signals
-    wire signed [31:0] dk;
-    wire signed [31:0] d1;
+    // Delay line for input signal v. Array size is PARAM_K3.
+    logic signed [SIZE_ADC_DATA-1:0] v_delay [0:PARAM_K3-1]; 
     
-    // Accumulator registers p, q, s
-    reg signed [31:0] p_reg;
-    reg signed [31:0] q_reg;
-    reg signed [31:0] s_reg;
+    // Delay line for difference d1. Array size is PARAM_L3.
+    logic signed [SIZE_FILTER_DATA-1:0] d1_delay [0:PARAM_L3-1]; 
     
-    // Variables for calculations
-    reg signed [31:0] next_p;
-    reg signed [31:0] next_q;
+    integer i, j;
 
+    // Accumulator registers to store sums (filter memory between clock cycles)
+    logic signed [SIZE_FILTER_DATA-1:0] p_reg;
+    logic signed [SIZE_FILTER_DATA-1:0] q_reg;
+    logic signed [SIZE_FILTER_DATA-1:0] s_reg;
 
-    // Calc of differences (dk = v(n)-v(n-k), d1 = v(n)-v(n-1))
-    assign dk = $signed(v_in) - $signed(v_delay[PARAM_K3]);
-    assign d1 = $signed(v_in) - $signed(v_delay[1]);
+    // Intermediate combinatorial signals for instant formula evaluation
+    logic signed [SIZE_FILTER_DATA-1:0] dk;
+    logic signed [SIZE_FILTER_DATA-1:0] d1;
+    logic signed [SIZE_FILTER_DATA-1:0] p_comb;
+    logic signed [SIZE_FILTER_DATA-1:0] q_comb;
+    logic signed [SIZE_FILTER_DATA-1:0] s_comb;
 
-    // Synchron processing of each clock cycle
+    // 1. Calculate differences for the current cycle (in SystemVerilog v_delay[0] represents v(n-1))
+    assign dk = $signed(v_in) - $signed(v_delay[PARAM_K3-1]);
+    assign d1 = $signed(v_in) - $signed(v_delay[0]);
+
+    // 2. Calculate p(n) = p_prev + dk - k * d1(n-l)
+    assign p_comb = p_reg + dk - (PARAM_K3 * $signed(d1_delay[PARAM_L3-1]));
+
+    // 3. Calculate q(n) = q_prev + m2 * p(n)
+    assign q_comb = q_reg + (PARAM_M23 * p_comb);
+
+    // 4. Calculate s(n) = s_prev + q(n) + m1 * p(n)
+    assign s_comb = s_reg + q_comb + (PARAM_M13 * p_comb);
+
+    // Flip-flop block: memory update and shifting on the rising edge of clk
     always_ff @(posedge clk or posedge reset) begin
         if (reset) begin
+            // Asynchronous reset of all registers to 0
             p_reg <= '0;
             q_reg <= '0;
             s_reg <= '0;
             s_out <= '0;
-            for (int i = 1; i <= PARAM_K3; i++) v_delay[i]  <= '0;
-            for (int j = 1; j <= PARAM_L3; j++) d1_delay[j] <= '0;
+            for (i = 0; i < PARAM_K3; i = i + 1)   v_delay[i]  <= '0;
+            for (j = 0; j < PARAM_L3; j = j + 1)   d1_delay[j] <= '0;
         end else begin
-            // Input signal delay line shift
-            for (int i = PARAM_K3; i > 1; i--) begin
+            // Shift the v_delay line (moving from the end of the array to the beginning)
+            for (i = PARAM_K3 - 1; i > 0; i = i - 1) begin
                 v_delay[i] <= v_delay[i-1];
             end
-            v_delay[1] <= v_in;
-            
-            // Delay line shift for the difference d1
-            for (int j = PARAM_L3; j > 1; j--) begin
+            v_delay[0] <= $signed(v_in);
+
+            // Shift the d1_delay line (moving from the end of the array to the beginning)
+            for (j = PARAM_L3 - 1; j > 0; j = j - 1) begin
                 d1_delay[j] <= d1_delay[j-1];
             end
-            d1_delay[1] <= d1; 
+            d1_delay[0] <= d1;
 
-            // Intermediate signals for the current clock cycle
-            next_p = p_reg + dk - (PARAM_K3 * d1_delay[PARAM_L3]);
-            next_q = q_reg + (PARAM_M23 * next_p);
+            // Update accumulator registers with the calculated values
+            p_reg <= p_comb;
+            q_reg <= q_comb;
+            s_reg <= s_comb;
 
-            // Updating accumulator registers
-            p_reg <= next_p;
-            q_reg <= next_q;
-            s_reg <= s_reg + next_q + (PARAM_M13 * next_p);
-
-            // Filter result
-            s_out <= s_reg + next_q + (PARAM_M13 * next_p) >>> 16;
-
+            // Registered output, latched simultaneously with s_reg
+            s_out <= s_comb[SIZE_FILTER_DATA-1:0];
         end
     end
 
