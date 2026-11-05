@@ -1,4 +1,4 @@
-`include "filter_params.vh"
+import package_settings_v_2::*;
 import package_settings::*;
 
 module v2_filter (

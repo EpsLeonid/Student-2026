@@ -22,6 +22,7 @@
  *  	rom_exp_sig_gen*/
 //-----------------------------------------------------------------------------
 import package_settings::*;
+import package_settings_v_2::*;
 import package_v5_params::*;   
 import package_settings_v_3::*;
 import package_settings_v_7::*;
