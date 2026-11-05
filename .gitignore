@@ -20,3 +20,34 @@
 *.sld
 *.log
 *.qsf
+# Quartus II temporary / generated folders and files
+/Quartus/*/db/
+/Quartus/*/incremental_db/
+/Quartus/*/simulation/
+/Quartus/*/output_files/
+/Quartus/*/incremental_db/
+/Quartus/*/*.rpt
+/Quartus/*/*.summary
+/Quartus/*/*.jic
+/Quartus/*/*.pin
+/Quartus/*/*.sof
+/Quartus/*/*.pof
+/Quartus/*/*.elf
+/Quartus/*/*.hex
+/Quartus/*/*.log
+/Quartus/*/*.bak
+/Quartus/*/*.smsg
+/Quartus/*/*.qws
+/Quartus/*/db/
+/db/
+/incremental_db/
+/simulation/
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.swp
+.*.un~
+.DS_Store
