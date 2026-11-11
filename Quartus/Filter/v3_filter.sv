@@ -14,8 +14,8 @@ import package_settings_v_3::*; // Include variant 3 parameters (PARAM_L3, PARAM
 module v3_filter (
     input wire clk,                           // Clock signal
     input wire reset,                         // Reset signal
-    input wire [SIZE_ADC_DATA-1:0] v_in,      // Input signal v(n) from the generator
-    output logic [SIZE_FILTER_DATA-1:0] s_out // Filtered registered output s(n)
+    input wire [SIZE_ADC_DATA-1:0] input_data,      // Input signal v(n) from the generator
+    output logic [SIZE_FILTER_DATA-1:0] output_data // Filtered registered output s(n)
 );
 
     // Delay line for input signal v. Array size is PARAM_K3.
@@ -39,8 +39,8 @@ module v3_filter (
     logic signed [SIZE_FILTER_DATA-1:0] s_comb;
 
     // 1. Calculate differences for the current cycle (in SystemVerilog v_delay[0] represents v(n-1))
-    assign dk = $signed(v_in) - $signed(v_delay[PARAM_K3-1]);
-    assign d1 = $signed(v_in) - $signed(v_delay[0]);
+    assign dk = $signed(input_data) - $signed(v_delay[PARAM_K3-1]);
+    assign d1 = $signed(input_data) - $signed(v_delay[0]);
 
     // 2. Calculate p(n) = p_prev + dk - k * d1(n-l)
     assign p_comb = p_reg + dk - (PARAM_K3 * $signed(d1_delay[PARAM_L3-1]));
@@ -58,7 +58,7 @@ module v3_filter (
             p_reg <= '0;
             q_reg <= '0;
             s_reg <= '0;
-            s_out <= '0;
+            output_data <= '0;
             for (i = 0; i < PARAM_K3; i = i + 1)   v_delay[i]  <= '0;
             for (j = 0; j < PARAM_L3; j = j + 1)   d1_delay[j] <= '0;
         end else begin
@@ -66,7 +66,7 @@ module v3_filter (
             for (i = PARAM_K3 - 1; i > 0; i = i - 1) begin
                 v_delay[i] <= v_delay[i-1];
             end
-            v_delay[0] <= $signed(v_in);
+            v_delay[0] <= $signed(input_data);
 
             // Shift the d1_delay line (moving from the end of the array to the beginning)
             for (j = PARAM_L3 - 1; j > 0; j = j - 1) begin
@@ -80,7 +80,7 @@ module v3_filter (
             s_reg <= s_comb;
 
             // Registered output, latched simultaneously with s_reg
-            s_out <= s_comb[SIZE_FILTER_DATA-1:0];
+            output_data <= s_comb[SIZE_FILTER_DATA-1:0];
         end
     end
 
