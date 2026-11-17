@@ -26,6 +26,7 @@ import package_settings_v_2::*;
 import package_v5_params::*;   
 import package_settings_v_3::*;
 import package_settings_v_7::*;
+import package_settings_v_8::*;
 //-----------------------------------------------------------------------------
 module filter (
 //-----------------------------------------------------------------------------
@@ -50,9 +51,9 @@ module filter (
 	output wire [SIZE_FILTER_DATA-1:0]						output_data_v4,
 	output wire [SIZE_FILTER_DATA-1:0]						output_data_v5,	  
 /*	output wire [SIZE_FILTER_DATA-1:0]						output_data_v6,*/
-	output wire [SIZE_FILTER_DATA-1:0]						output_data_v7
-/*	output wire [SIZE_FILTER_DATA-1:0]						output_data_v8
-*/	);
+	output wire [SIZE_FILTER_DATA-1:0]						output_data_v7,
+	output wire [SIZE_FILTER_DATA-1:0]						output_data_v8
+	);
 //-----------------------------------------------------------------------------
 // Signal declarations
 //-----------------------------------------------------------------------------
@@ -118,10 +119,10 @@ module filter (
 		.input_data                                           (output_data_exp_sig_gen),
 		.output_data                                          (output_data_v7));
 
-//	v8_filter FilterV8 (
-//		.clk                                                  (clk),
-//		.reset                                                (reset),
-//		.input_data                                           (output_data_exp_sig_gen),
-//		.output_data                                          (output_data_v8));
+	v8_filter FilterV8 (
+		.clk                                                  (clk),
+		.reset                                                (reset),
+		.input_data                                           (output_data_exp_sig_gen),
+		.output_data                                          (output_data_v8));
 
 endmodule

@@ -1,62 +1,67 @@
-`include "v8_params.vh"
+//-----------------------------------------------------------------------------
+// Title       : Triangular Shaping Filter - Variant 8
+// File        : v8_filter.sv
+// Author      : Yakunin Arseniy
+// Description : Hardware implementation of triangular shaping filter (Variant 8):
+//               k = V8_K (7), l = V8_L (7), M = V8_M (16)
+//-----------------------------------------------------------------------------
 import package_settings::*;
+import package_settings_v_8::*;
 
-module v8_filter #(
-    parameter V8_K_PARAM  = V8_K,
-    parameter V8_L_PARAM  = V8_L,
-    parameter V8_KL_PARAM = V8_KL,
-    parameter V8_M_PARAM  = V8_M
-)(
-    input  wire                                 clk,
-    input  wire                                 reset,
-    input  wire signed [SIZE_ADC_DATA-1:0]      input_data,  // v(n) from exp_sig_gen
-    output reg  signed [SIZE_FILTER_DATA-1:0]   output_data  // s(n) filtered pulse
+module v8_filter (
+    input  wire                        clk,            // Main system clock driver
+    input  wire                        reset,          // Asynchronous active-low reset (!reset)
+    input  wire [SIZE_ADC_DATA-1:0]    input_data,     // Raw unsigned data sample stream from ADC
+    output wire [SIZE_FILTER_DATA-1:0] output_data     // Processed 16-bit filter output stream
 );
 
-    // Shift registers for delaying input signal v(n)
-    reg signed [SIZE_ADC_DATA-1:0] shift_reg_v8 [1:V8_KL_PARAM];
-
-    // Internal calculation registers
-    reg signed [SIZE_FILTER_DATA-1:0] d_v8; // Double difference
-    reg signed [SIZE_FILTER_DATA-1:0] p_v8; // 1st accumulator state
-    reg signed [SIZE_FILTER_DATA-1:0] r_v8; // Deconvolution signal
-
-    // Taps from the delay pipeline
-    wire signed [SIZE_ADC_DATA-1:0] v_n   = input_data;
-    wire signed [SIZE_ADC_DATA-1:0] v_nk  = shift_reg_v8[V8_K_PARAM];
-    wire signed [SIZE_ADC_DATA-1:0] v_nl  = shift_reg_v8[V8_L_PARAM];
-    wire signed [SIZE_ADC_DATA-1:0] v_nkl = shift_reg_v8[V8_KL_PARAM];
-
+    // Shift register array pipeline tracking historical input samples (k + l = 14)
+    logic [SIZE_ADC_DATA-1:0] v_delay_v8 [0:(V8_K + V8_L)-1];
     integer i;
 
-    always_ff @(posedge clk or posedge reset) begin
-        if (reset) begin
-            for (i = 1; i <= V8_KL_PARAM; i = i + 1) begin
-                shift_reg_v8[i] <= '0;
+    // Internal integration accumulators (24-bit signed prevents overflow)
+    logic signed [23:0] p_reg_v8;
+    logic signed [23:0] s_reg_v8;
+
+    // Combinational nets for single-cycle intermediate math evaluations
+    logic signed [23:0] d_v8;
+    logic signed [23:0] p_next_v8;
+    logic signed [23:0] r_v8;
+
+    // Step 1: Double finite difference d(n) = v(n) - v(n-k) - v(n-l) + v(n-k-l)
+    assign d_v8 = $signed({1'b0, input_data})
+                - $signed({1'b0, v_delay_v8[V8_K - 1]})
+                - $signed({1'b0, v_delay_v8[V8_L - 1]})
+                + $signed({1'b0, v_delay_v8[V8_K + V8_L - 1]});
+
+    // Step 2: First digital integrator p(n) = p(n-1) + d(n)
+    assign p_next_v8 = p_reg_v8 + d_v8;
+
+    // Step 3: Deconvolution / decay compensation r(n) = p(n) + M * d(n)
+    assign r_v8 = p_next_v8 + 24'(V8_M * d_v8);
+
+    // Sequential Registers Stage (active-low reset)
+    always_ff @(posedge clk or negedge reset) begin
+        if (!reset) begin
+            p_reg_v8 <= 24'sd0;
+            s_reg_v8 <= 24'sd0;
+            for (i = 0; i < (V8_K + V8_L); i = i + 1) begin
+                v_delay_v8[i] <= {SIZE_ADC_DATA{1'b0}};
             end
-            d_v8        <= '0;
-            p_v8        <= '0;
-            r_v8        <= '0;
-            output_data <= '0;
         end else begin
-            // Pipeline Shift Register: advance data along delay chain
-            shift_reg_v8[1] <= v_n;
-            for (i = 2; i <= V8_KL_PARAM; i = i + 1) begin
-                shift_reg_v8[i] <= shift_reg_v8[i-1];
+            // Shift delay pipeline
+            v_delay_v8[0] <= input_data;
+            for (i = 1; i < (V8_K + V8_L); i = i + 1) begin
+                v_delay_v8[i] <= v_delay_v8[i-1];
             end
 
-            // Double difference calculation
-            d_v8 <= v_n - v_nk - v_nl + v_nkl;
-
-            // First digital integrator
-            p_v8 <= p_v8 + d_v8;
-
-            // Deconvolution
-            r_v8 <= p_v8 + (V8_M_PARAM * d_v8);
-
-            // Second digital integrator
-            output_data <= output_data + r_v8;
+            // Update integrators
+            p_reg_v8 <= p_next_v8;
+            s_reg_v8 <= s_reg_v8 + r_v8;
         end
     end
+
+    // Step 4: Output scaled final accumulator value to 16-bit bus (divide by 16)
+    assign output_data = s_reg_v8[19:4];
 
 endmodule
