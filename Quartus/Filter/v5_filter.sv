@@ -6,17 +6,17 @@
 // s = s_prev + r
 
 // Connect the global project settings file to take from it
-// the bit widths of the input and output buses (SIZE_ADC_DATA and SIZE_FILTER_DATA).
+// the bit widths of the input and output tires (SIZE_ADC_DATA and SIZE_FILTER_DATA).
 import package_settings::*;
 
 // Connect my file with filter coefficients (K5, L5, M5).
 import package_v5_params::*;
 
 module v5_filter (
-    input  wire clk,           // Clock signal
-    input  wire reset,         // Active-low Reset signal
-    input  wire [SIZE_ADC_DATA-1:0] input_data,    // Input signal v(n)
-    output wire [SIZE_FILTER_DATA-1:0] output_data    // Output signal s(n)
+    input  wire clk, // Clock signal
+    input  wire reset, // Active-low Reset signal
+    input  wire [SIZE_ADC_DATA-1:0] input_data, // Input signal v(n)
+    output wire [SIZE_FILTER_DATA-1:0] output_data // Output signal s(n)
 );
 
     // Array of registers to store past values of the input signal.
@@ -31,14 +31,16 @@ module v5_filter (
     // to the old ones from clock to clock (cumsum in MATLAB).
     // The signed type is needed because the result of subtraction
     // in signal d can be negative.
-    logic signed [SIZE_FILTER_DATA-1:0] p_reg;
-    logic signed [SIZE_FILTER_DATA-1:0] s_reg;
+    // We use 24 bits (instead of SIZE_FILTER_DATA) to avoid overflow,
+    // because the accumulated sums grow very fast.
+    logic signed [23:0] p_reg;
+    logic signed [23:0] s_reg;
 
     // Signals d and r.
     // They are needed as intermediate steps for calculations by formulas.
     // They are calculated instantly, without waiting for the clock.
-    logic signed [SIZE_FILTER_DATA-1:0] d;
-    logic signed [SIZE_FILTER_DATA-1:0] r;
+    logic signed [23:0] d;
+    logic signed [23:0] r;
 
     // Calculate d(n) by the formula using the current and delayed signals.
     // $signed() forces the program to process data as signed numbers.
@@ -77,8 +79,8 @@ module v5_filter (
     end
 
     // Output the total sum s to the output.
-    // Since the sum bit width may be larger than the output port's,
-    // we take only the lower bits (those that fit into SIZE_FILTER_DATA).
-    assign output_data = s_reg[SIZE_FILTER_DATA-1:0];
+    // Since the internal sum is 24 bits wide, we take only the upper bits
+    // (bits [23:8]) to avoid overflow and scale the result down.
+    assign output_data = s_reg[23:8];
 
 endmodule
