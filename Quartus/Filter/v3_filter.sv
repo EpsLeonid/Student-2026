@@ -52,8 +52,8 @@ module v3_filter (
     assign s_comb = s_reg + q_comb + (PARAM_M13 * p_comb);
 
     // Flip-flop block: memory update and shifting on the rising edge of clk
-    always_ff @(posedge clk or posedge reset) begin
-        if (reset) begin
+    always_ff @(posedge clk or negedge reset) begin
+        if (!reset) begin
             // Asynchronous reset of all registers to 0
             p_reg <= '0;
             q_reg <= '0;
