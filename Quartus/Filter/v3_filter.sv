@@ -22,25 +22,25 @@ module v3_filter (
     logic signed [SIZE_ADC_DATA-1:0] v_delay [0:PARAM_K3-1]; 
     
     // Delay line for difference d1. Array size is PARAM_L3.
-    logic signed [SIZE_FILTER_DATA-1:0] d1_delay [0:PARAM_L3-1]; 
+    logic signed [23:0] d1_delay [0:PARAM_L3-1]; 
     
     integer i, j;
 
     // Accumulator registers to store sums (filter memory between clock cycles)
-    logic signed [SIZE_FILTER_DATA-1:0] p_reg;
-    logic signed [SIZE_FILTER_DATA-1:0] q_reg;
-    logic signed [SIZE_FILTER_DATA-1:0] s_reg;
+    logic signed [23:0] p_reg;
+    logic signed [23:0] q_reg;
+    logic signed [23:0] s_reg;
 
     // Intermediate combinatorial signals for instant formula evaluation
-    logic signed [SIZE_FILTER_DATA-1:0] dk;
-    logic signed [SIZE_FILTER_DATA-1:0] d1;
-    logic signed [SIZE_FILTER_DATA-1:0] p_comb;
-    logic signed [SIZE_FILTER_DATA-1:0] q_comb;
-    logic signed [SIZE_FILTER_DATA-1:0] s_comb;
+    logic signed [23:0] dk;
+    logic signed [23:0] d1;
+    logic signed [23:0] p_comb;
+    logic signed [23:0] q_comb;
+    logic signed [23:0] s_comb;
 
     // 1. Calculate differences for the current cycle (in SystemVerilog v_delay[0] represents v(n-1))
-    assign dk = $signed(input_data) - $signed(v_delay[PARAM_K3-1]);
-    assign d1 = $signed(input_data) - $signed(v_delay[0]);
+    assign dk = $signed({1'b0, input_data}) - $signed({1'b0, v_delay[PARAM_K3-1]});
+    assign d1 = $signed({1'b0, input_data}) - $signed({1'b0, v_delay[0]});
 
     // 2. Calculate p(n) = p_prev + dk - k * d1(n-l)
     assign p_comb = p_reg + dk - (PARAM_K3 * $signed(d1_delay[PARAM_L3-1]));
@@ -80,7 +80,7 @@ module v3_filter (
             s_reg <= s_comb;
 
             // Registered output, latched simultaneously with s_reg
-            output_data <= s_comb[SIZE_FILTER_DATA-1:0];
+            output_data <= s_comb[23:8];
         end
     end
 
