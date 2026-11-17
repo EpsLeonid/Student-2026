@@ -1,117 +1,86 @@
-// Modified cusp-like recursive filter
+// v6_filter.sv
 //
-// Implements the recursive finite-length cusp-like pulse shaper:
+// Modified cusp-like filter
+//
 //   dk(n) = v(n) - v(n-k)
 //   d1(n) = v(n) - v(n-1)
 //   p(n)  = p(n-1) + dk(n) - k * d1(n-l)
 //   q(n)  = q(n-1) + m2 * p(n)
 //   s(n)  = s(n-1) + q(n) + m1 * p(n)
 
+`timescale 1 ns / 1 ps
+
 import package_settings::*;
 import package_settings_v_6::*;
 
 module v6_filter (
-    input  wire                         clk,     // System clock
-    input  wire                         reset,   // Synchronous-active-high reset 
-    input  wire signed [15:0]           v,       // Raw input sample v(n)
-    output reg  signed [15:0]           s        // Filtered output sample s(n)
+    input  wire                            clk,
+    input  wire                            reset,
+    input  wire signed [SIZE_ADC_DATA-1:0] input_data,
+    output logic signed [SIZE_FILTER_DATA-1:0] output_data
 );
 
-    // Number of fractional bits used by fixed-point coefficients m1/m2
-    localparam int FRAC = 16;
-
-    reg signed [15:0] v_delay [1:k_v6]; // v_delay[1] = v(n-1), v_delay[2] = v(n-2), ...
-    reg signed [31:0] d1_delay [1:l_v6]; // d1_delay[1] = d1(n-1), d1_delay[2] = d1(n-2), 
-
-    // First-order and k-order input differences
-    wire signed [31:0] dk;   // dk(n) = v(n) - v(n-k)
-    wire signed [31:0] d1;   // d1(n) = v(n) - v(n-1)
-
-    // Recursive accumulator registers
-    reg signed [31:0] p_reg; // p(n-1)
-    reg signed [31:0] q_reg; // q(n-1)
-    reg signed [31:0] s_reg; // s(n-1)
-
-    // Next-state values calculated during the current clock cycle
-    reg signed [31:0] next_p;
-    reg signed [31:0] next_q;
-    reg signed [31:0] next_s;
-
+ 
+    // Input sample history (delay line):
+    //   v_hist[1] = v(n-1), v_hist[2] = v(n-2), ..., v_hist[k] = v(n-k)
+    logic signed [31:0] v_hist [1:k_v6];
     
-    assign dk = $signed(v) - $signed(v_delay[k_v6]);//  dk(n) = v(n) - v(n-k)    
-    assign d1 = $signed(v) - $signed(v_delay[1]);   //  d1(n) = v(n) - v(n-1)
+    // Filter state registers 
+    logic signed [31:0] p_state = 0;
+    logic signed [31:0] q_state = 0;
+    logic signed [31:0] s_state = 0;
 
-    // Select d1(n-l):
-    // - If l = 1, use the current difference d1(n).
-    // - Otherwise, use the delayed value d1(n-l).
-    wire signed [31:0] d1_l =
-        (l_v6 == 1) ? d1 : d1_delay[l_v6];
+    // Input difference signals
+    wire signed [31:0] dk;    // dk(n)   = v(n)   - v(n-k)
+    wire signed [31:0] d1_l;  // d1(n-l) = v(n-l) - v(n-l-1)
+
+    // Combinational next-state values of the accumulators
+    wire signed [31:0] p_next;
+    wire signed [31:0] q_next;
+    wire signed [31:0] s_next;
+     
+    // dk(n) = v(n) - v(n-k)
+    assign dk = $signed(input_data) - $signed(v_hist[k_v6]);
+
+    // d1(n-l) = v(n-l) - v(n-l-1) = v_hist[l] - v_hist[l+1]
+    assign d1_l = $signed(v_hist[l_v6]) - $signed(v_hist[l_v6 + 1]);
 
     // p(n) = p(n-1) + dk(n) - k * d1(n-l)
-    // Use a wider intermediate result to reduce overflow risk.
-    wire signed [63:0] k_d1   = $signed(k_v6) * $signed(d1_l);
-    wire signed [63:0] p_full = $signed(p_reg) + $signed(dk) - k_d1;
+    assign p_next = p_state + dk - ($signed(k_v6) * d1_l);
 
     // q(n) = q(n-1) + m2 * p(n)
-    // m2 is a QFRAC fixed-point coefficient, so shift the product right.
-    wire signed [63:0] q_full =
-        $signed(q_reg) +
-        (($signed(m2_v6) * $signed(next_p)) >>> FRAC);
-
+    assign q_next = q_state + $signed(m2_v6) * p_next;
+         
     // s(n) = s(n-1) + q(n) + m1 * p(n)
-    // m1 is also a QFRAC fixed-point coefficient.
-    wire signed [63:0] s_full =
-        $signed(s_reg) + $signed(next_q) +
-        (($signed(m1_v6) * $signed(next_p)) >>> FRAC);
+    assign s_next = s_state + q_next + $signed(m1_v6) * p_next;
 
-    // Truncate wide intermediate results back to 32-bit accumulator width.
-    // For a production design, consider saturation instead of truncation.
-    assign next_p = p_full[31:0];
-    assign next_q = q_full[31:0];
-    assign next_s = s_full[31:0];
+     
+    // Sequential logic
+    always_ff @(posedge clk) begin
+        if (!reset) begin
+            p_state     <= 0;
+            q_state     <= 0;
+            s_state     <= 0;
+            output_data <= 0;
 
-    // Sequential logic: update delay lines and recursive accumulators
-    always_ff @(posedge clk or posedge reset) begin
-        if (reset) begin
-            // Clear all filter state
-            p_reg <= '0;
-            q_reg <= '0;
-            s_reg <= '0;
-            s     <= '0;
-
-            // Initialize the input delay line
             for (int i = 1; i <= k_v6; i++) begin
-                v_delay[i] <= '0;
-            end
-
-            // Initialize the d1 delay line
-            for (int j = 1; j <= l_v6; j++) begin
-                d1_delay[j] <= '0;
+                v_hist[i] <= '0;
             end
         end
         else begin
-            // Shift the input delay line:
-            // v_delay[i] <= v_delay[i-1]
+            // Shift the sample history (v_hist[1] holds the previous sample).
             for (int i = k_v6; i > 1; i--) begin
-                v_delay[i] <= v_delay[i-1];
+                v_hist[i] <= v_hist[i-1];
             end
-            v_delay[1] <= v;
+            v_hist[1] <= input_data;
 
-            // Shift the d1 delay line:
-            // d1_delay[j] <= d1_delay[j-1]
-            for (int j = l_v6; j > 1; j--) begin
-                d1_delay[j] <= d1_delay[j-1];
-            end
-            d1_delay[1] <= d1;
+            // Update filter state.
+            p_state <= p_next;
+            q_state <= q_next;
+            s_state <= s_next;
 
-            // Update recursive accumulator states
-            p_reg <= next_p;
-            q_reg <= next_q;
-            s_reg <= next_s;
-
-            // Convert the fixed-point accumulator to the 16-bit output format.
-            // Adjust this shift if the desired output scaling differs.
-            s <= next_s >>> FRAC;
+            // Output without saturation: scaled by 2^-8.
+            output_data <= s_next >>> 8;
         end
     end
 
