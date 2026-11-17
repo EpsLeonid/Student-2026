@@ -14,7 +14,7 @@ import package_v5_params::*;
 
 module v5_filter (
     input  wire clk,           // Clock signal
-    input  wire reset,         // Reset signal
+    input  wire reset,         // Active-low Reset signal
     input  wire [SIZE_ADC_DATA-1:0] input_data,    // Input signal v(n)
     output wire [SIZE_FILTER_DATA-1:0] output_data    // Output signal s(n)
 );
@@ -52,8 +52,8 @@ module v5_filter (
 
     // Block that triggers on the clock edge (clk) or on reset (reset).
     // All calculations with memory happen inside.
-    always_ff @(posedge clk or posedge reset) begin
-        if (reset) begin
+    always_ff @(posedge clk or negedge reset) begin
+        if (!reset) begin
             // If reset is pressed, clear the sum variables and
             // zero out the entire array with stored old values.
             p_reg <= '0;
