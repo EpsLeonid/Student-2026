@@ -62,6 +62,6 @@ module v8_filter (
     end
 
     // Step 4: Output scaled final accumulator value to 16-bit bus (divide by 16)
-    assign output_data = s_reg_v8[19:4];
+    assign output_data = s_reg_v8[23:8];
 
 endmodule
