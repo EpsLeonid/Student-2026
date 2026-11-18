@@ -34,8 +34,8 @@ module v7_filter (
 
     // Sequential Registers Stage:
     // Handles memory updates, pipeline shifts, and accumulation loops
-    always_ff @(posedge clk or posedge reset) begin
-        if (reset) begin
+    always_ff @(posedge clk or negedge reset) begin
+        if (!reset) begin
             // Hardware state initialization on system reset
             p_reg <= '0;
             s_reg <= '0;
