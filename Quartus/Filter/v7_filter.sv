@@ -18,16 +18,16 @@ module v7_filter (
     integer i;
 
     // Internal integration accumulators (signed format prevents underflow wrapping)
-    logic signed [SIZE_FILTER_DATA-1:0] p_reg;
-    logic signed [SIZE_FILTER_DATA-1:0] s_reg;
+    logic signed [23:0] p_reg;
+    logic signed [23:0] s_reg;
 
     // Combinational nets for single-cycle intermediate math evaluations
-    logic signed [SIZE_FILTER_DATA-1:0] d;
-    logic signed [SIZE_FILTER_DATA-1:0] r;
+    logic signed [23:0] d;
+    logic signed [23:0] r;
 
     // Combinational Logic Stage:
     // Derives the primary finite difference value 'd' using tapped history nodes
-    assign d = $signed(input_data) - $signed(v_delay[K7-1]) - $signed(v_delay[L7-1]) + $signed(v_delay[K7+L7-1]);
+    assign d = $signed({1'b0, input_data}) - $signed({1'b0,v_delay[K7-1]}) - $signed({1'b0,v_delay[L7-1]}) + $signed({1'b0,v_delay[K7+L7-1]});
 
     // Scales the finite difference value alongside the accumulator status
     assign r = p_reg + (M7 + 1) * d;
@@ -52,10 +52,8 @@ module v7_filter (
             // Dual stage numeric integration updates
             p_reg <= p_reg + d;
             s_reg <= s_reg + r;
+            output_data <= s_reg[23:8];
         end
     end
-
-    // Assign final accumulator value to output bus (truncates higher unmapped bits)
-    assign output_data = s_reg[SIZE_FILTER_DATA-1:0];
 
 endmodule
