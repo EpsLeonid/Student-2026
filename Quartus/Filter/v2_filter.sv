@@ -58,7 +58,7 @@ module v2_filter (
         end
     end
 
-    // Assign scaled final accumulator value to 16-bit output bus (divide by 16)
-    assign output_data = s_reg[19:4];
+    // Assign scaled final accumulator value to 16-bit output bus (divide by 256)
+    assign output_data = s_reg[23:8];
 
 endmodule
