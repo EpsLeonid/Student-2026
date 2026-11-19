@@ -1,10 +1,12 @@
 package package_settings_v_1;
 
-// Параметры трапецеидального фильтра, вариант 1: k=8, l=5, M=16
-parameter K         = 8;    // задержка первой линии
-parameter L         = 5 ;   // задержка второй линии
-parameter M         = 16 ;  // коэффициент усиления M
-parameter IN_WIDTH  = 12 ;  // разрядность входного сигнала (АЦП, 12 бит)
-parameter OUT_WIDTH = 16 ;  // разрядность выходной шины (без переполнения)
+    // Вариант 1: трапецеидальный фильтр (формулы Б)
+    localparam int K         = 8;    // параметр k
+    localparam int L         = 5;    // параметер l
+    localparam int M         = 16;   // параметр M
+
+    localparam int IN_WIDTH  = 12;   // разрядность входа (АЦП)
+    localparam int OUT_WIDTH = 16;   // разрядность выхода
+    localparam int ACC_WIDTH = 24;   // разрядность аккумуляторов
 
 endpackage
