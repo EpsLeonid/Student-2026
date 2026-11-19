@@ -14,11 +14,11 @@ module v1_filter (
     integer i;
 
     // Аккумуляторы двойного интегрирования
-    reg signed [ACC_WIDTH-1:0] p_reg;
-    reg signed [ACC_WIDTH-1:0] s_reg;
+    reg signed [23:0] p_reg;
+    reg signed [23:0] s_reg;
 
-    wire signed [ACC_WIDTH-1:0] d;
-    wire signed [ACC_WIDTH-1:0] r;
+    wire signed [23:0] d;
+    wire signed [23:0] r;
 
     // d(n) = v(n) - v(n-k) - v(n-l) + v(n-k-l)
     assign d = $signed({1'b0, input_data})
@@ -33,8 +33,8 @@ module v1_filter (
 
     always @(posedge clk or negedge reset) begin
         if (!reset) begin
-            p_reg <= {ACC_WIDTH{1'b0}};
-            s_reg <= {ACC_WIDTH{1'b0}};
+            p_reg <= 24'sd0;
+            s_reg <= 24'sd0;
             for (i = 0; i < DELAY_LEN; i = i + 1)
                 v_delay[i] <= {IN_WIDTH{1'b0}};
         end else begin
