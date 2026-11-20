@@ -29,6 +29,7 @@ import package_settings_v_3::*;
 import package_settings_v_6::*;
 import package_settings_v_7::*;
 import package_settings_v_8::*;
+import package_settings_v_4::*;
 //-----------------------------------------------------------------------------
 module filter (
 //-----------------------------------------------------------------------------
